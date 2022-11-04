@@ -1,0 +1,4 @@
+﻿  Source.cpp
+D:\Projects\PA\Lab2\Lab2\Source.cpp(11,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+D:\Projects\PA\Lab2\Lab2\Queue.h(127): warning C4715: PreorityQueue<Field>::pop: значение возвращается не при всех путях выполнения
+  Lab2.vcxproj -> D:\Projects\PA\Lab2\x64\Debug\Lab2.exe
