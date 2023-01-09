@@ -60,17 +60,14 @@ namespace Lab4
         public void OnlookerPhase()
         {
             //Танець бджіл
-            double sum = 0;
-            foreach(var vertice in ChoosenVertices) sum += Food[vertice];
-            
-            double MaxP = (double)Food[ChoosenVertices[0]] / sum;
+            double maxFood = Food[ChoosenVertices[0]];
             int choosenVertice = ChoosenVertices[0];
             foreach(var vertice in ChoosenVertices)
             {
-                double P = (double)Food[vertice] / sum;
-                if(P > MaxP)
+                double food = Food[vertice];
+                if(food > maxFood)
                 {
-                    MaxP = P;
+                    maxFood = food;
                     choosenVertice = vertice;
                 }
             }
@@ -78,61 +75,36 @@ namespace Lab4
             ChoosenVertices.Clear();
 
             //Збір нектару з елітного джерела та розвідка його околу
+            VerticeColor verticeColor = new VerticeColor(this);
             int usedOnlookers = 0;
             foreach (var adjacentVertice in area.GetAdjacentVertices(choosenVertice))
             {
                 if(usedOnlookers < Onlooker - 1)
-                ColorVertice(adjacentVertice);
+                verticeColor.ColorVertice(adjacentVertice);
                 usedOnlookers++;
             }
-            ColorVertice(choosenVertice);
+            verticeColor.ColorVertice(choosenVertice);
             Food[choosenVertice] = 0;
             EmptyVertices.Add(choosenVertice);
         }
-        //Метод розфарбування вершини
-        public void ColorVertice(int vertice)
+        public void Solve(bool IsProgressBarEnabled)
         {
-            foreach (var color in UsedColors)
+            if (IsProgressBarEnabled)
             {
-                if(CheckColorWithAdjecent(vertice, color))
-                {
-                    if (ColoredVertices.ContainsKey(vertice)) ColoredVertices[vertice] = color;
-                    else ColoredVertices.Add(vertice, color);
-                    return;
-                }
+                Console.WriteLine("\n\nProgress: |==========|");
+                Console.Write("           ");
             }
-            foreach (var color in AllColors)
-            {
-                if (CheckColorWithAdjecent(vertice, color))
-                {
-                    if (ColoredVertices.ContainsKey(vertice)) ColoredVertices[vertice] = color;
-                    else ColoredVertices.Add(vertice, color);
-                    if (!UsedColors.Contains(color)) UsedColors.Add(color);
-                }
-            }
-        }
-        //Функція перевірки допустимосці розфарбування вершини певним кольором
-        public bool CheckColorWithAdjecent(int vertice, string color)
-        {
-            List<int> adjecentVertices = area.GetAdjacentVertices(vertice);
-
-            foreach(var adjacentVertice in adjecentVertices)
-            {
-                if (ColoredVertices.Contains(new KeyValuePair<int,string>(adjacentVertice, color))) return false;
-            }
-            return true;
-        }
-        //Цільова функція
-        public int ObjectiveFunction()
-        {
-            while(EmptyVertices.Count != area.CountVertices)
+            while (EmptyVertices.Count != area.CountVertices)
             {
                 ScoutPfase();
                 OnlookerPhase();
                 List<string> UsedColorsWithDublicats = ColoredVertices.Values.ToList();
                 UsedColors = UsedColorsWithDublicats.Distinct().ToList();
+                if (IsProgressBarEnabled && EmptyVertices.Count % (area.CountVertices / 10) == 0)
+                    Console.Write("^");
             }
-            return UsedColors.Count;
         }
+        //Цільова функція
+        public int ObjectiveFunction() => UsedColors.Count;
     }
 }

@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace Lab4
 {
-    public class Graph
+    public interface IGraph
+    {
+        int CountDegree(int vertice);
+        IEnumerable<int> GetAdjacentVertices(int vertice);
+    }
+
+    public class Graph : IGraph
     {
         //Матриця суміжностей графу
         private int[,] matrix;
@@ -67,14 +73,11 @@ namespace Lab4
             return count;
         }
         //Метод що повертає список суміжніх вершин для вказаної вершини
-        public List<int> GetAdjacentVertices(int vertice)
+        public IEnumerable<int> GetAdjacentVertices(int vertice)
         {
-            List<int> AdjecentVertices = new List<int> ();
             for (int i = 0; i < CountVertices; i++)
-            {
-                if (matrix[vertice, i] == 1) AdjecentVertices.Add(i);
-            }
-            return AdjecentVertices;
+                if (matrix[vertice, i] == 1) 
+                    yield return i;
         }
     }
 }
